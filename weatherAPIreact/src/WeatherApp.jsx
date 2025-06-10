@@ -1,10 +1,9 @@
-import { useState , useEffect } from 'react';
+import { useState } from 'react';
 import './WeatherApp.css';
 
 const API_KEY = "fbf7cb72862cfcf4f9951be617a30db1";
 
 function WeatherApp() {
-
     const [city, setCity] = useState("");
     const [temp, setTemp] = useState("0");
     const [tempFeel, setTempFeel] = useState("0");
@@ -13,29 +12,25 @@ function WeatherApp() {
     const [weather, setWeather] = useState("");
     const [inputCity, setInputCity] = useState("");
     const [error, setError] = useState("Please enter a city");
-    const [isFirstRender, setIsFirstRender] = useState(true);
 
-    const URL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=imperial`;
+    const resetWeatherData = () => {
+        setTemp("0");
+        setTempFeel("0");
+        setWind("0");
+        setHumidity("0");
+        setWeather("");
+    };
 
-    async function getWeather() {
-        if (!city) {
-            setError("Please enter a city");
-            return;
-        }
-
+    async function getWeather(cityName) {
         try {
-            const response = await fetch(URL);
+            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}&units=imperial`);
             const data = await response.json();
             console.log(data);
 
-            if (!response.ok) {
-                setError("City not found.");
+            if (data.cod === "404") {
+                setError("City not found");
                 setCity("");
-                setTemp("0");
-                setTempFeel("0");
-                setWind("0");
-                setHumidity("0");
-                setWeather("");
+                resetWeatherData();
                 return;
             }
 
@@ -46,27 +41,22 @@ function WeatherApp() {
             setWind(Math.round(data.wind.speed));
             setHumidity(data.main.humidity);
             setWeather(data.weather[0].description);
-        } catch (error) {
-            console.error(error);
+        } catch (err) {
+            console.error(err);
             setError("Error fetching weather data");
-            setTemp("0");
-            setTempFeel("0");
-            setWind("0");
-            setHumidity("0");
-            setWeather("");
+            setCity("");
+            resetWeatherData();
         }
     }
 
-    useEffect(() => {
-        if (!isFirstRender) {
-            getWeather();
-        }
-        setIsFirstRender(false);
-    }, [city]);
-
     const handleSubmit = () => {
         if (inputCity.trim()) {
-            setCity(inputCity);
+            setError("");
+            getWeather(inputCity.trim());
+        } else {
+            setError("Please enter a city");
+            setCity("");
+            resetWeatherData();
         }
     };
 
