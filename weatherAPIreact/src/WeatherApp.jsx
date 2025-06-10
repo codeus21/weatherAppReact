@@ -1,4 +1,5 @@
 import { useState , useEffect } from 'react';
+import './WeatherApp.css';
 
 const API_KEY = "fbf7cb72862cfcf4f9951be617a30db1";
 
@@ -18,7 +19,7 @@ function WeatherApp() {
 
     async function getWeather() {
         if (!city) {
-            setError("Please enter a city.");
+            setError("Please enter a city");
             return;
         }
 
@@ -29,6 +30,7 @@ function WeatherApp() {
 
             if (!response.ok) {
                 setError("City not found.");
+                setCity("");
                 setTemp("0");
                 setTempFeel("0");
                 setWind("0");
@@ -69,7 +71,7 @@ function WeatherApp() {
     };
 
     return (
-        <div>
+        <div className='appContainer'>
             <h1 className='mainTitle'>Weather App</h1>
             <input 
                 type='text' 
@@ -79,8 +81,8 @@ function WeatherApp() {
                 className='cityInput'
             />
             <button onClick={handleSubmit} className='getWeatherButton'>Get Weather</button>
-            
-            <div>
+
+            <div className='weatherCard'>
                 <h3 className='errorDisplay'>{error}</h3>
                 <h2 className='cityDisplay'>{city}</h2>
                 <p className='tempDisplay'>Temperature: {temp}°F</p>
